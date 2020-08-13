@@ -2,6 +2,7 @@
 # Personal machine learning experiment manager with ZSH tab completion.
 # 
 # Usage:
+# $ moka ls                     #==> shows all running jobs
 # $ moka <exp>                  #==> prints path to configuration file
 # $ moka <exp> <operation>      #==> executes operation for experiment exp
 # $ moka <exp1> -- <exp2>       #==> copies the configuration file from exp1 to exp2
