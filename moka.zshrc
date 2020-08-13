@@ -15,8 +15,10 @@ moka()
 {
     python -m moka.launcher $@
     if [[ "$#" -eq "1" ]]; then
-        EXP=$1
-        echo "configs/$EXP.sh"
+        if [[ $1 -ne "ls" ]]; then
+            EXP=$1
+            echo "configs/$EXP.sh"
+        fi
     elif [[ "$#" -eq "3" ]]; then
         EXP=$3
         echo "configs/$EXP.sh"
