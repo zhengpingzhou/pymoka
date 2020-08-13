@@ -53,8 +53,8 @@ if __name__ == '__main__':
                     break
             python_jobs.append(python_job)
 
-        table = [(j.user, j.pid, j.cpu, j.mem, j.start_time, j.wall_time, j.moka_id) for j in python_jobs]
-        print(tabulate(table, ['User', 'PID', '%CPU', '%MEM', 'START', 'TIME', 'ID'], tablefmt="fancy_grid"))
+        table = [(j.user, j.pid, j.cpu, j.mem, j.start_time, j.wall_time, j.moka_id, j.command[:30] + ('...' if len(j.command) > 30 else '')) for j in python_jobs]
+        print(tabulate(table, ['User', 'PID', '%CPU', '%MEM', 'START', 'TIME', 'ID', 'Command'], tablefmt="fancy_grid"))
 
         sys.exit()
 
