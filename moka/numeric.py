@@ -1,3 +1,7 @@
+import random
+import numpy.linalg as LA
+
+
 def normalize(value, value_min, value_max):
     """Map value from [value_min, value_max] to [-1, 1]"""
     return 2 * ((value - value_min) / (value_max - value_min)) - 1

@@ -47,14 +47,16 @@ if __name__ == '__main__':
         for moka_id in moka_ids:
             python_job = None
             for j in jobs:
-                if re.findall(f'python .* -id {moka_id} .*', j.command):
+                found = re.findall(f'python (.+\\.py) -id {moka_id} .*', j.command)
+                if found:
                     python_job = j 
                     j.moka_id = moka_id
+                    j.script = found[0]
                     break
             python_jobs.append(python_job)
 
-        table = [(j.user, j.pid, j.cpu, j.mem, j.start_time, j.wall_time, j.moka_id, j.command[:30] + ('...' if len(j.command) > 30 else '')) for j in python_jobs]
-        print(tabulate(table, ['User', 'PID', '%CPU', '%MEM', 'START', 'TIME', 'ID', 'Command'], tablefmt="fancy_grid"))
+        table = [(j.user, j.pid, j.cpu, j.mem, j.start_time, j.wall_time, j.moka_id, j.script) for j in python_jobs]
+        print(tabulate(table, ['User', 'PID', '%CPU', '%MEM', 'START', 'TIME', 'ID', 'Script'], tablefmt="fancy_grid"))
 
         sys.exit()
 
@@ -98,8 +100,10 @@ if __name__ == '__main__':
 
         else:
             if 'common' in config:
-                REGEX_EXP = r'EXP="(.+)"'
-                REGEX_ID = r'ID="(.+)"'
+                REGEX_EXP = r'^EXP="(.+)"'
+                REGEX_ID = r'^ID="(.+)"'
+                COMMON_EXP = None
+                COMMON_ID = None
                 for line in config['common']:
                     found_exp = re.findall(REGEX_EXP, line)
                     found_id = re.findall(REGEX_ID, line)
@@ -108,9 +112,11 @@ if __name__ == '__main__':
                     elif found_id:
                         COMMON_ID = found_id[0]
 
-                COMMON_ID = COMMON_ID.replace('${EXP}', COMMON_EXP)      
-                if COMMON_ID != EXP and ask(f'ID `{COMMON_ID}` != filename `{EXP}`, continue?') != 'y':
-                    sys.exit(-1)
+                if COMMON_EXP is not None and COMMON_ID is not None:
+                    COMMON_ID = COMMON_ID.replace('${EXP}', COMMON_EXP)    
+                if COMMON_ID is not None:  
+                    if COMMON_ID != EXP and ask(f'ID `{COMMON_ID}` != filename `{EXP}`, continue?') != 'y':
+                        sys.exit(-1)
 
             script = ''.join(config.get('common', '')) + '\n' + ''.join(config[CMD])
             shell(script, verbose=not option[CMD].silent)

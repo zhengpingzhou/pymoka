@@ -73,9 +73,9 @@ def plot_box(im, box, color, thickness=2, solid=False, alpha=1.0, verbose=True):
         y1 = max(0, min(y1, H - 1))
         y2 = max(0, min(y2, H - 1))
         clipped = [x1, y1, x2, y2]
-        if verbose:
-            sys.stderr.write(f'WARNING: invalid box: {box}, Clipped to: {clipped}\n')
-            sys.stderr.flush()
+        # if verbose:
+        #     sys.stderr.write(f'WARNING: invalid box: {box}, Clipped to: {clipped}\n')
+        #     sys.stderr.flush()
         box = clipped
 
     if not solid:

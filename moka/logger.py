@@ -51,7 +51,7 @@ class Statistics(object):
             data = []
             for k in self:
                 data.append([k, self.mean(k), self.max(k), self.min(k)])
-            return '\n\n' + tabulate(data, headers=['Metric', 'Average', 'Max', 'Min']) + '\n\n'
+            return '\n\n' + tabulate(data, headers=['Metric', 'Average', 'Max', 'Min'], tablefmt="fancy_grid") + '\n\n'
 
     def items(self):
         return self.d.items()
