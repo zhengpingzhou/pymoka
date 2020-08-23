@@ -7,7 +7,12 @@ class g(object):
 
 
 class Dict(object):
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
+        assert len(args) <= 1
+
+        if len(args) == 1:
+            self.update(args[0])
+
         for k, v in kwargs.items():
             setattr(self, k, v)
 
@@ -23,12 +28,15 @@ class Dict(object):
     def __iter__(self):
         for k in vars(self): yield k
 
+    def to_dict(self, d):
+        if isinstance(d, dict): return d
+        return vars(d)
+
     def items(self):
         return vars(self).items()
 
     def update(self, d):
-        if not isinstance(d, dict):
-            d = vars(d)
+        d = self.to_dict(d)
         for k, v in d.items():
             setattr(self, k, v)
 

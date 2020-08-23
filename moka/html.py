@@ -17,7 +17,57 @@ from .mpl import *
 
 
 ##################################################################################
-class HTML:
+class BaseHTML:
+    """This HTML class allows us to save images and write texts into a single HTML file.
+
+     It consists of functions such as <add_header> (add a text header to the HTML file),
+     <add_images> (add a row of images to the HTML file), and <save> (save the HTML to the disk).
+     It is based on Python library 'dominate', a Python library for creating and manipulating HTML documents using a DOM API.
+    """
+    def get_image_dir(self):
+        """Return the directory that stores images"""
+        return self.img_dir
+
+    def add_header(self, text):
+        """Insert a header to the HTML file
+
+        Parameters:
+            text (str) -- the header text
+        """
+        with self.doc:
+            h3(text)
+
+    def add_images(self, ims, txts, links, width=400):
+        """add images to the HTML file
+
+        Parameters:
+            ims (str list)   -- a list of image paths
+            txts (str list)  -- a list of image names shown on the website
+            links (str list) --  a list of hyperref links; when you click an image, it will redirect you to a new page
+        """
+        self.t = table(border=1, style="table-layout: fixed;")  # Insert a table
+        self.doc.add(self.t)
+        with self.t:
+            with tr():
+                for im, txt, link in zip(ims, txts, links):
+                    with td(style="word-wrap: break-word;", halign="center", valign="top"):
+                        with p():
+                            with a(href=os.path.join('images', link)):
+                                img(style="width:%dpx" % width, src=os.path.join('images', im))
+                            br()
+                            p(txt)
+
+    def save(self, verbose=True):
+        """save the current content to the HMTL file"""
+        html_file = '%s/index.html' % self.web_dir
+        f = open(html_file, 'wt')
+        f.write(self.doc.render())
+        f.close()
+        if verbose: print(self)
+
+
+##################################################################################
+class HTML(BaseHTML):
     """This HTML class allows us to save images and write texts into a single HTML file.
      It consists of functions such as <add_header> (add a text header to the HTML file),
      <add_images> (add a row of images to the HTML file), and <save> (save the HTML to the disk).
@@ -25,14 +75,18 @@ class HTML:
 
      e.g. html = HTML('/something', 'My Awesome Page', base_url='www')
     """
-    def __init__(self, web_dir, title, refresh=0, overwrite=False, base_url=None, inverted=False):
+    def __init__(self, web_dir, title=None, refresh=0, overwrite=True, base_url='~/www', inverted=False):
         """Initialize the HTML classes
         Parameters:
             web_dir (str) -- a directory that stores the webpage. HTML file will be created at <web_dir>/index.html; images will be saved at <web_dir/images/
             title (str)   -- the webpage name
             refresh (int) -- how often the website refresh itself; if 0; no refreshing
         """
+        if title is None:
+            title = web_dir.split('/')[-1]
+
         self.title = title
+
         self._url = web_dir
         self.web_dir = web_dir
 
@@ -72,6 +126,7 @@ class HTML:
             with self.doc.head:
                 meta(http_equiv="refresh", content=str(refresh))
 
+
     def h2(self, txt):
         """Insert a header to the HTML file
         Parameters:
@@ -94,15 +149,10 @@ class HTML:
     def add_bigtable(self, ncols):
         return HTMLBigTable(self, ncols)
 
-    def save(self):
-        """save the current content to the HMTL file"""
-        html_file = '%s/index.html' % self.web_dir
-        if os.path.isfile(html_file) and not self.overwrite:
-            ans = ask(f'file {html_file} exists. overwrite?')
-            if ans == 'n': return
-        f = open(html_file, 'wt')
-        f.write(self.doc.render())
-        f.close()
+    def add_video(self, video, title='video', width=None):
+        T = self.add_table()
+        T.set_widths({title: width})
+        T.add_row({title: Video(video)})
 
     def url(self, domain=None):
         if domain is None:
@@ -116,7 +166,10 @@ class HTML:
         os.system(f'chromium-browser {self.url(domain)}')
 
     def __repr__(self):
-        return self.doc.render()
+        www_host = os.environ['WWW_HOST']
+        www_port = os.environ['WWW_PORT']
+        domain = f'{www_host}:{www_port}'
+        return self.url(domain)
 
 
 ##################################################################################
@@ -222,25 +275,36 @@ class HTMLTable:
         elif isinstance(value, matplotlib.legend.Legend):
             export_legend(value, im_abs_path)
 
+        else:
+            raise ValueError(f'Unsupported image type: `{type(value)}`')
+
         img(style=f"width:{width}px", src=im_rel_path)
         self.num_images += 1
 
 
-    def add_video(self, value, width=400):
+    def add_video(self, value, width=None):
         if isinstance(value, str):
             filename = value.replace('/', '_')
             os.system(f'cp {value} {self.html.video_dir}/{filename}')
             vd_rel_path = f'videos/{filename}'
+            if width is None: width = 400
 
-        else:
+        elif isinstance(value, Video):
+            assert len(value) > 0, 'Empty video!'
             vd_dir = self.html.video_dir
             vd_id = self.start_vd_id + self.num_videos
             vd_path = f'{vd_id:06d}.mp4'
             vd_abs_path = f'{vd_dir}/{vd_path}'
             vd_rel_path = f'videos/{vd_path}'
 
-            save_video(vd_abs_path, value, fps=5, verbose=False)
+            if width is None: 
+                width = value[0].shape[1]
+
+            save_video(vd_abs_path, value, fps=20, verbose=False)
             self.num_videos += 1
+
+        else:
+            raise ValueError(f'Unsupported video type: `{type(value)}`')
 
         video(src=vd_rel_path, width=f'{width}px', height='auto', 
               controls='true', autoplay='true', loop='true', muted='true', playsinline='true')
