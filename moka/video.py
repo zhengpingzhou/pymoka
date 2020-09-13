@@ -10,6 +10,9 @@ class Video(list):
     def __init__(self, images=[]):
         super(Video, self).__init__(images)
 
+    def save(self, filename, **kwargs):
+        save_video(filename, self, **kwargs)
+
 
 def save_video(filename, images, fps=20, keep_images=False, verbose=True):
     assert len(images) > 0, len(images)

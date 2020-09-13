@@ -18,7 +18,7 @@ def plot_line(im, p1, p2, color=(0, 0, 255), thickness=2):
 
 
 def plot_text(im, text, color=(0, 0, 0), scale=1, thickness=1, pos='br', box=None, margin=5,
-    minScale=1, minThickness=1):
+    minScale=0.3, minThickness=1):
     """Returns: [x1, y1, x2, y2] bounding box of text"""
     font                   = cv2.FONT_HERSHEY_SIMPLEX
     fontScale              = scale
@@ -41,7 +41,7 @@ def plot_text(im, text, color=(0, 0, 0), scale=1, thickness=1, pos='br', box=Non
     t = y1 + text_height + margin
     b = y2 - margin
     l = x1 + margin
-    r = x2 - text_width - margin
+    r = x2 - text_width
     if pos == 'br' or pos == 'rb':
         loc = (r, b)
     elif pos == 'tr' or pos == 'rt':
