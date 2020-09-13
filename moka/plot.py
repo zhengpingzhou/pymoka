@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 
 from .color import *
+from .mpl import *
 
 ##################################################################################
 # OpenCV
@@ -88,17 +89,24 @@ def plot_box(im, box, color, thickness=2, solid=False, alpha=1.0, verbose=True):
         im[y1:y2, x1:x2, :] = patch
 
 
-def heatmap(x, cmap='jet', normalize=True):
+def heatmap(x, a_min=None, a_max=None, normalize=True, cmap='jet'):
     # BGR
     assert len(x.shape) == 2
     h, w = x.shape
 
+    if a_min is None:
+        a_min = x.min()
+
+    if a_max is None:
+        a_max = x.max()
+
     if normalize:
-        x = (x - x.min()) / (x.max() - x.min())
+        x = (x - a_min) / (a_max - a_min)
 
     if cmap == 'jet':
         x = cv2.applyColorMap(np.uint8(x * 255), cv2.COLORMAP_JET)
         return x[..., :3]
+        
     elif cmap == 'mpl':
         return cv2.resize(fig2im(*gridview([x])), (w, h))[:, :, ::-1]
 
