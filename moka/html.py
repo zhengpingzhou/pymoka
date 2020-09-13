@@ -286,6 +286,7 @@ class HTMLTable:
         if isinstance(value, str):
             filename = value.replace('/', '_')
             os.system(f'cp {value} {self.html.video_dir}/{filename}')
+            vd_abs_path = f'{self.html.video_dir}/{filename}'
             vd_rel_path = f'videos/{filename}'
             if width is None: width = 400
 
@@ -303,11 +304,11 @@ class HTMLTable:
             save_video(vd_abs_path, value, fps=20, verbose=False)
             self.num_videos += 1
 
-        else:
-            raise ValueError(f'Unsupported video type: `{type(value)}`')
+        os.system(f'ffmpeg -y -loglevel error -i {vd_abs_path} -pix_fmt rgb24 {vd_abs_path.replace(".mp4", ".gif")}')
+        img(src=vd_rel_path.replace('.mp4', '.gif'), style=f"width:{width}px")
 
-        video(src=vd_rel_path, width=f'{width}px', height='auto', 
-              controls='true', autoplay='true', loop='true', muted='true', playsinline='true')
+        # video(src=vd_rel_path, width=f'{width}px', height='auto', 
+        #       controls='true', autoplay='true', loop='true', muted='true', playsinline='true')
 
 
     def set_header(self, *args, **kwargs):
