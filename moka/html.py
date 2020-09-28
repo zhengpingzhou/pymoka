@@ -304,11 +304,11 @@ class HTMLTable:
             save_video(vd_abs_path, value, fps=20, verbose=False)
             self.num_videos += 1
 
-        os.system(f'ffmpeg -y -loglevel error -i {vd_abs_path} -pix_fmt rgb24 {vd_abs_path.replace(".mp4", ".gif")}')
-        img(src=vd_rel_path.replace('.mp4', '.gif'), style=f"width:{width}px")
+        # os.system(f'ffmpeg -y -loglevel error -i {vd_abs_path} -pix_fmt rgb24 {vd_abs_path.replace(".mp4", ".gif")}')
+        # img(src=vd_rel_path.replace('.mp4', '.gif'), style=f"width:{width}px")
 
-        # video(src=vd_rel_path, width=f'{width}px', height='auto', 
-        #       controls='true', autoplay='true', loop='true', muted='true', playsinline='true')
+        video(src=vd_rel_path, width=f'{width}px', height='auto', 
+              controls='true', autoplay='true', loop='true', muted='true', playsinline='true')
 
 
     def set_header(self, *args, **kwargs):
