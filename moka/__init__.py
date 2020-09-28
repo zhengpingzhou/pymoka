@@ -5,6 +5,7 @@
 # Email: zpzhou@stanford.edu
 # Last Updated: 2020
 ##################################################################################
+import h5py
 
 from .core import *
 from .numeric import *
