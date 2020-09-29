@@ -166,9 +166,12 @@ class HTML(BaseHTML):
         os.system(f'chromium-browser {self.url(domain)}')
 
     def __repr__(self):
-        www_host = os.environ['WWW_HOST']
-        www_port = os.environ['WWW_PORT']
-        domain = f'{www_host}:{www_port}'
+        try:
+            www_host = os.environ['WWW_HOST']
+            www_port = os.environ['WWW_PORT']
+            domain = f'{www_host}:{www_port}'
+        except:
+            domain = None
         return self.url(domain)
 
 
